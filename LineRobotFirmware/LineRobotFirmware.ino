@@ -57,15 +57,17 @@ void loop() {
   }
 }
 
-void setWheelLeft(uint8_t speed){
-Serial.println(speed);  // test
-leftWheel->setSpeed(speed);
+void setWheelLeft(uint8_t speed) {
+  Serial.println(speed);  // test
+  leftWheel->setSpeed(speed);
 }
-void setWheelRight(uint8_t speed){
-Serial.println(speed);  // test
-rightWheel->setSpeed(speed);
+
+void setWheelRight(uint8_t speed) {
+  Serial.println(speed);  // test
+  rightWheel->setSpeed(speed);
 }
-void readSensors(){
+
+void readSensors() {
   // read right sensor voltage:
   int RVal = analogRead(RIGHT_SENSE);
   // read left sensor voltage:
@@ -76,8 +78,8 @@ void readSensors(){
   sprintf(buffer, "(%d,%d)", RVal, LVal);
   Serial.println(buffer);
 }
-void stop(){
-// stop both motors
-leftWheel->setSpeed(0);
-rightWheel->setSpeed(0);
+void stop() {
+  // stop both motors
+  leftWheel->setSpeed(0);
+  rightWheel->setSpeed(0);
 }
