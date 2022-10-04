@@ -40,14 +40,10 @@ def send_command(ser: serial.Serial, command: str):
         command: A string representing a command to send to the Arduino.
 
     Returns:
-        A number representing the response from the Arduino. If the response is
-        invalid, returns 0.
+        A string representing the received message from the Arduino.
     """
     message = bytes(command.strip() + "\n", "utf-8")
     ser.write(message)
     data = ser.readline()
     # data is a bytestring, return it as a number.
-    try:
-        return int(data.decode("utf-8").strip())
-    except(ValueError):
-        return 0
+    return data.decode("utf-8").strip()
