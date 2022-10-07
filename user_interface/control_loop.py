@@ -26,12 +26,14 @@ def turn_left(arduino: serial.Serial, speed: int):
     Turn left at given speed.
     """
     send_command(arduino, f"setWheelLeft {speed}")
+    send_command(arduino, "setWheelRight 0")
 
 
 def turn_right(arduino: serial.Serial, speed: int):
     """
     Turn right at given speed.
     """
+    send_command(arduino, "setWheelLeft 0")
     send_command(arduino, f"setWheelRight {speed}")
 
 

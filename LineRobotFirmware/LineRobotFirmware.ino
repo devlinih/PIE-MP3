@@ -6,9 +6,10 @@
 
 // create motor sheild object
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-// assign motors to ports
+// Initialize global variables for DC motors
 Adafruit_DCMotor *leftWheel = AFMS.getMotor(3);   // left wheel port 3
 Adafruit_DCMotor *rightWheel = AFMS.getMotor(4);  // right wheel port 4
+
 // assign sensor pins
 const int RIGHT_SENSE = 0;  // analog pin 0
 const int LEFT_SENSE = 1;   // analog pin 1
@@ -30,8 +31,8 @@ void setup() {
   leftWheel->setSpeed(0);
 
   // motors always run forwards
-  leftWheel->run(FORWARD);
-  rightWheel->run(FORWARD);
+  leftWheel->run(RELEASE);
+  rightWheel->run(RELEASE);
 }
 
 void loop() {
@@ -45,11 +46,13 @@ void loop() {
     uint8_t speed = command.substring(command.indexOf(" ")+1, command.length()).toInt();
     leftWheel->run(FORWARD);
     leftWheel->setSpeed(speed);
+    Serial.println(speed);
 
   } else if (command.startsWith("setWheelRight")) {
     uint8_t speed = command.substring(command.indexOf(" ")+1, command.length()).toInt();
     rightWheel->run(FORWARD);
     rightWheel->setSpeed(speed);
+    Serial.println(speed);
 
   } else if (command.equals("readSensors")) {
     // send sensor readings over serial
