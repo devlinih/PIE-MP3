@@ -24,13 +24,6 @@ void setup() {
   Serial.begin(115200);
   Serial.println("START");
 
-  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
-  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
-    Serial.println("Could not find Motor Shield. Check wiring.");
-    while (1);
-  }
-  Serial.println("Motor Shield found.");
-
   // set initial motor speeds to 0
   rightWheel->setSpeed(0);
   leftWheel->setSpeed(0);
