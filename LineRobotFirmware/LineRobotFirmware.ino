@@ -24,13 +24,20 @@ void setup() {
   Serial.begin(115200);
   Serial.println("START");
 
-  // motors always run forwards
-  leftWheel->run(FORWARD);
-  rightWheel->run(FORWARD);
+  if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
+  // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
+    Serial.println("Could not find Motor Shield. Check wiring.");
+    while (1);
+  }
+  Serial.println("Motor Shield found.");
 
   // set initial motor speeds to 0
   rightWheel->setSpeed(0);
   leftWheel->setSpeed(0);
+
+  // motors always run forwards
+  leftWheel->run(FORWARD);
+  rightWheel->run(FORWARD);
 }
 
 void loop() {
@@ -42,29 +49,22 @@ void loop() {
     // note: wheel will be in the form "setWheelDirection N" where N is speed
     // extract speed from command string
     uint8_t speed = command.substring(command.indexOf(" ")+1, command.length()).toInt();
-    setWheelLeft(speed);
+    leftWheel->run(FORWARD);
+    leftWheel->setSpeed(speed);
 
   } else if (command.startsWith("setWheelRight")) {
     uint8_t speed = command.substring(command.indexOf(" ")+1, command.length()).toInt();
-    setWheelRight(speed);
+    rightWheel->run(FORWARD);
+    rightWheel->setSpeed(speed);
 
   } else if (command.equals("readSensors")) {
     // send sensor readings over serial
     readSensors();
   } else if (command.equals("STOP")) {
     // stop motors
-    stop();
+    rightWheel->run(RELEASE);
+    leftWheel->run(RELEASE);
   }
-}
-
-void setWheelLeft(uint8_t speed) {
-  Serial.println(speed);  // test
-  leftWheel->setSpeed(speed);
-}
-
-void setWheelRight(uint8_t speed) {
-  Serial.println(speed);  // test
-  rightWheel->setSpeed(speed);
 }
 
 void readSensors() {
@@ -77,9 +77,4 @@ void readSensors() {
   char buffer[40];
   sprintf(buffer, "(%d,%d)", RVal, LVal);
   Serial.println(buffer);
-}
-void stop() {
-  // stop both motors
-  leftWheel->setSpeed(0);
-  rightWheel->setSpeed(0);
 }
