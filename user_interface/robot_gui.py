@@ -129,10 +129,10 @@ def run_robot(arduino: serial.Serial,
                     break
                 case ["SPEED", val]:
                     print(f"Setting Speed to {val}")
-                    speed = val
+                    speed = int(val)
                 case ["THRESHOLD", val]:
                     print(f"Setting Sensor Threshold to {val}")
-                    threshold = val
+                    threshold = int(val)
         if moving:
             control_cycle(arduino, speed, threshold)
         else:
