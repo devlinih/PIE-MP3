@@ -22,7 +22,7 @@ void stop();
 void setup() {
   // initialize serial communication
   Serial.begin(115200);
-  Serial.println("START");
+  // Serial.println("START");
 
   // set initial motor speeds to 0
   rightWheel->setSpeed(0);
