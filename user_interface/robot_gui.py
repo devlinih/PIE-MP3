@@ -129,6 +129,7 @@ class RobotGui:
         data = self.sensors.data
         # A tuple of (-1, -1) for sensor data indicates program is shutting down
         if data != (-1, -1):
+            self.sensor_status.configure(text=f"{data}")
             self.update_job = self.root.after(50, self.update_sensors)
 
 
