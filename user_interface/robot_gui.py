@@ -25,6 +25,8 @@ from control_loop import (control_cycle,
 
 # Don't care about locking or race conditions because this isn't for anything
 # computationally important, just for visualizing the current sensor readings.
+
+
 class SensorData:
     """
     Class to store the sensor data between threads.
@@ -35,6 +37,7 @@ class SensorData:
 
     def update(self, data):
         self.data = data
+
 
 class RobotGui:
     """
@@ -62,22 +65,22 @@ class RobotGui:
         stop.pack()
 
         speed = tk.Scale(self.root,
-                         from_ = 0, to = 255,
-                         orient = tk.HORIZONTAL,
-                         showvalue = tk.TRUE,
-                         command = self.set_speed)
+                         from_=0, to=255,
+                         orient=tk.HORIZONTAL,
+                         showvalue=tk.TRUE,
+                         command=self.set_speed)
         speed.set(30)
         speed.pack()
 
         threshold = tk.Scale(self.root,
-                             from_ = 0, to = 1023,
-                             orient = tk.HORIZONTAL,
-                             showvalue = tk.TRUE,
-                             command = self.set_threshold)
+                             from_=0, to=1023,
+                             orient=tk.HORIZONTAL,
+                             showvalue=tk.TRUE,
+                             command=self.set_threshold)
         threshold.set(400)
         threshold.pack()
 
-        self.sensor_status = tk.Label(self.root, text = "foobar")
+        self.sensor_status = tk.Label(self.root, text="foobar")
         self.sensor_status.pack()
         self.update_job = self.root.after(50, self.update_sensors)
 

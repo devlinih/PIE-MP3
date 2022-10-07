@@ -59,14 +59,23 @@ def control_cycle(arduino: serial.Serial, speed: int, threshold: int) -> tuple:
     """
     data = read_sensors(arduino)
 
-    if data[0] > threshold:
-        turn_left(arduino, speed)
-    if data[1] > threshold:
-        turn_right(arduino, speed)
-    else:
-        move_straight(arduino, speed)
-    return data
+    left_over_tape = data[0] > threshold
+    right_over_tape = data[1] > threshold
 
+    match (left_over_tape, right_over_tape):
+        case (True, True):
+            # Both sensors are over tape, we are at start line
+            move_straight(arduino, speed)
+        case (False, False):
+            # Neither sensor is over tape
+            move_straight(arduino, speed)
+        case (True, False):
+            # Left sensor is over tape, turn right as sensor is in rear
+            turn_right(arduino, speed)
+        case (False, True):
+            # Right sensor is over tape, turn left as sensor is in rear
+            turn_left(arduino, speed)
+    return data
 
 
 def main():
