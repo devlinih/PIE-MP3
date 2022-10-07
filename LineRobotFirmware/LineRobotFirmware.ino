@@ -22,7 +22,7 @@ void stop();
 void setup() {
   // initialize serial communication
   Serial.begin(115200);
-  // Serial.println("START");
+  Serial.println("START");
 
   // motors always run forwards
   leftWheel->run(FORWARD);

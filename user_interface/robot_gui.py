@@ -2,13 +2,17 @@
 Tkinter based GUI for control loop
 """
 
+# Standard library stuff
 import threading
 from threading import Thread
 import queue
-import serial
 import time
 import tkinter as tk
 
+# PyPI
+import serial
+
+# Custom Modules
 from arduino import (guess_port,
                      BAUDRATE,
                      ARDUINO_TIMEOUT, )
@@ -45,11 +49,20 @@ class RobotGui:
         stop.pack()
 
         speed = tk.Scale(self.root,
-                         from_ = 0, to = 1000,
+                         from_ = 0, to = 255,
                          orient = tk.HORIZONTAL,
                          showvalue = tk.TRUE,
                          command = self.set_speed)
+        speed.set(30)
         speed.pack()
+
+        threshold = tk.Scale(self.root,
+                             from_ = 0, to = 1023,
+                             orient = tk.HORIZONTAL,
+                             showvalue = tk.TRUE,
+                             command = self.set_threshold)
+        threshold.set(400)
+        threshold.pack()
 
     def run(self):
         """
@@ -79,24 +92,51 @@ class RobotGui:
 
     def set_speed(self, speed):
         """
-        Add SPEED command.
+        Add SPEED N command.
         """
         self.add_to_queue(f"SPEED {int(speed)}")
 
+    def set_threshold(self, threshold):
+        """
+        Add THRESHOLD N command
+        """
+        self.add_to_queue(f"THRESHOLD {int(threshold)}")
 
-def consume_commands(arduino: serial.Serial,
-                     commands: queue.Queue,
-                     finished: queue.Queue, ):
+
+def run_robot(arduino: serial.Serial,
+              commands: queue.Queue,
+              finished: queue.Queue, ):
     """
     Process commands in queue and send to Arduino.
     """
+    moving = False
+    speed = 30
+    threshold = 400
     while True:
         if not commands.empty():
             command = commands.get()
-            print(command)
-            if command == "DONE":
-                break
-
+            # Pattern matching, we require Python 3.10
+            match command.split():
+                case ["START"]:
+                    print("Starting Robot")
+                    moving = True
+                case ["STOP"]:
+                    print("Stopping Robot")
+                    moving = False
+                case ["DONE"]:
+                    print("Stopping Robot")
+                    stop_robot(arduino)
+                    break
+                case ["SPEED", val]:
+                    print(f"Setting Speed to {val}")
+                    speed = val
+                case ["THRESHOLD", val]:
+                    print(f"Setting Sensor Threshold to {val}")
+                    threshold = val
+        if moving:
+            control_cycle(arduino, speed, threshold)
+        else:
+            stop_robot(arduino)
 
 
 def main():
@@ -119,7 +159,7 @@ def main():
     gui = RobotGui(commands)
 
     # Start thread to process tasty data
-    consumer = Thread(target=consume_commands,
+    consumer = Thread(target=run_robot,
                       args=[arduino, commands, finished],
                       daemon=True)
     consumer.start()
@@ -130,6 +170,11 @@ def main():
     # Wait for queue to finish. Add a DONE command.
     commands.put("DONE")
     finished.join()
+
+    # Clean up
+    print(f"Closing {port}")
+    arduino.close()
+    time.sleep(1)
 
     print("Thank you for using our line follower!")
 
