@@ -64,6 +64,7 @@ void loop() {
     // stop motors
     rightWheel->run(RELEASE);
     leftWheel->run(RELEASE);
+    Serial.println("0");
   }
 }
 
