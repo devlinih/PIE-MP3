@@ -77,7 +77,7 @@ class RobotGui:
                              orient=tk.HORIZONTAL,
                              showvalue=tk.TRUE,
                              command=self.set_threshold)
-        threshold.set(400)
+        threshold.set(900)
         threshold.pack()
 
         self.sensor_status = tk.Label(self.root, text="foobar")
@@ -141,7 +141,7 @@ def run_robot(arduino: serial.Serial,
     """
     moving = False
     speed = 30
-    threshold = 400
+    threshold = 900
     while True:
         if not commands.empty():
             command = commands.get()

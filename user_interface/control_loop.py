@@ -16,9 +16,8 @@ def move_straight(arduino: serial.Serial, speed: int):
     """
     Move forward at a given speed.
     """
-    adjusted_speed = speed // 2
-    send_command(arduino, f"setWheelLeft {adjusted_speed}")
-    send_command(arduino, f"setWheelRight {adjusted_speed}")
+    send_command(arduino, f"setWheelLeft {speed}")
+    send_command(arduino, f"setWheelRight {speed}")
 
 
 def turn_left(arduino: serial.Serial, speed: int):
@@ -26,14 +25,14 @@ def turn_left(arduino: serial.Serial, speed: int):
     Turn left at given speed.
     """
     send_command(arduino, f"setWheelLeft {speed}")
-    send_command(arduino, "setWheelRight 0")
+    send_command(arduino, f"-setWheelRight {speed}")
 
 
 def turn_right(arduino: serial.Serial, speed: int):
     """
     Turn right at given speed.
     """
-    send_command(arduino, "setWheelLeft 0")
+    send_command(arduino, f"-setWheelLeft {speed}")
     send_command(arduino, f"setWheelRight {speed}")
 
 
