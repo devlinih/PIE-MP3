@@ -23,6 +23,7 @@ void setup() {
   // initialize serial communication
   Serial.begin(115200);
   // Serial.println("START");
+  AFMS.begin();
 
   // set initial motor speeds to 0
   rightWheel->setSpeed(0);
