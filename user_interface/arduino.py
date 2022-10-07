@@ -6,7 +6,7 @@ import ast
 import serial
 import serial.tools.list_ports as list_ports
 
-BAUDRATE = 9600
+BAUDRATE = 115200
 ARDUINO_TIMEOUT = 3  # seconds
 
 # List of Arduino IDs provided by Brad
