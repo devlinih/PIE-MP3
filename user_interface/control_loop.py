@@ -1,8 +1,5 @@
 """
 Control loop for line following robot.
-
-Right now, it's just hard coded, but adding CLI will be done later as well as
-GUI maybe.
 """
 
 import serial
@@ -45,6 +42,29 @@ def read_sensors(arduino: serial.Serial) -> tuple[int, int]:
     return parse_tuple(send_command(arduino, "readSensors"))
 
 
+def stop_robot(arduino: serial.Serial):
+    """
+    Stop robot.
+    """
+    send_command(arduino, "STOP")
+
+
+def control_cycle(arduino: serial.Serial, speed: int, threshold: int):
+    """
+    One one cycle of the control loop.
+    """
+    data = read_sensors(arduino)
+
+    if data[0] > threshold:
+        # If reading left, turn right
+        turn_right(arduino, speed)
+    if data[1] > threshold:
+        # If reading right, turn left
+        turn_left(arduino, speed)
+    else:
+        move_straight(arduino, speed)
+
+
 def main():
     """
     Main loop, no interaction
@@ -58,13 +78,7 @@ def main():
     time.sleep(5)
 
     while True:
-        data = read_sensors(arduino)
-        if data[0] > threshold:
-            turn_left(arduino, speed)
-        if data[1] > threshold:
-            turn_right(arduino, speed)
-        else:
-            move_straight(arduino, speed)
+        control_cycle(arduino, speed, threshold)
 
 
 if __name__ == "__main__":
