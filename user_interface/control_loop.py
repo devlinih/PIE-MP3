@@ -51,20 +51,22 @@ def stop_robot(arduino: serial.Serial):
     send_command(arduino, "STOP")
 
 
-def control_cycle(arduino: serial.Serial, speed: int, threshold: int):
+def control_cycle(arduino: serial.Serial, speed: int, threshold: int) -> tuple:
     """
     One one cycle of the control loop.
+
+    Returns the sensor readings.
     """
     data = read_sensors(arduino)
 
     if data[0] > threshold:
-        # If reading left, turn right
-        turn_right(arduino, speed)
-    if data[1] > threshold:
-        # If reading right, turn left
         turn_left(arduino, speed)
+    if data[1] > threshold:
+        turn_right(arduino, speed)
     else:
         move_straight(arduino, speed)
+    return data
+
 
 
 def main():
