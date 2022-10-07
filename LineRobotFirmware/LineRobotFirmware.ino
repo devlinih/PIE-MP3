@@ -22,7 +22,7 @@ void stop();
 void setup() {
   // initialize serial communication
   Serial.begin(115200);
-  Serial.println("START");
+  // Serial.println("START");
 
   if (!AFMS.begin()) {         // create with the default frequency 1.6KHz
   // if (!AFMS.begin(1000)) {  // OR with a different frequency, say 1KHz
