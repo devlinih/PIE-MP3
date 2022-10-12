@@ -67,6 +67,7 @@ class RobotGui:
         speed = tk.Scale(self.root,
                          from_=0, to=255,
                          orient=tk.HORIZONTAL,
+                         length=512,
                          showvalue=tk.TRUE,
                          command=self.set_speed)
         speed.set(30)
@@ -75,6 +76,7 @@ class RobotGui:
         threshold = tk.Scale(self.root,
                              from_=0, to=1023,
                              orient=tk.HORIZONTAL,
+                             length=512,
                              showvalue=tk.TRUE,
                              command=self.set_threshold)
         threshold.set(900)
