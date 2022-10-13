@@ -54,6 +54,18 @@ void loop() {
     rightWheel->setSpeed(speed);
     Serial.println(speed);
 
+  } else if (command.startsWith("-setWheelLeft")) {
+    uint8_t speed = command.substring(command.indexOf(" ")+1, command.length()).toInt();
+    leftWheel->run(BACKWARD);
+    leftWheel->setSpeed(speed);
+    Serial.println(speed);
+
+  } else if (command.startsWith("-setWheelRight")) {
+    uint8_t speed = command.substring(command.indexOf(" ")+1, command.length()).toInt();
+    rightWheel->run(BACKWARD);
+    rightWheel->setSpeed(speed);
+    Serial.println(speed);
+
   } else if (command.equals("readSensors")) {
     // send sensor readings over serial
     readSensors();

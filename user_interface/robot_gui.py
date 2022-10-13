@@ -23,17 +23,33 @@ from control_loop import (control_cycle,
 # https://www.oreilly.com/library/view/python-cookbook/0596001673/ch09s07.html
 # Not sure of licensing
 
+# Don't care about locking or race conditions because this isn't for anything
+# computationally important, just for visualizing the current sensor readings.
+
+
+class SensorData:
+    """
+    Class to store the sensor data between threads.
+    """
+
+    def __init__(self, data: tuple[int, int]):
+        self.data = data
+
+    def update(self, data):
+        self.data = data
+
 
 class RobotGui:
     """
     Class for GUI part of Robot. This is the producer.
     """
 
-    def __init__(self, commands: queue.Queue):
+    def __init__(self, commands: queue.Queue, sensors: SensorData):
         """
         Initializse GUI
         """
         self.commands = commands
+        self.sensors = sensors
 
         self.root = tk.Tk()
         self.root.title("Line Follower GUI")
@@ -49,20 +65,26 @@ class RobotGui:
         stop.pack()
 
         speed = tk.Scale(self.root,
-                         from_ = 0, to = 255,
-                         orient = tk.HORIZONTAL,
-                         showvalue = tk.TRUE,
-                         command = self.set_speed)
+                         from_=0, to=255,
+                         orient=tk.HORIZONTAL,
+                         length=512,
+                         showvalue=tk.TRUE,
+                         command=self.set_speed)
         speed.set(30)
         speed.pack()
 
         threshold = tk.Scale(self.root,
-                             from_ = 0, to = 1023,
-                             orient = tk.HORIZONTAL,
-                             showvalue = tk.TRUE,
-                             command = self.set_threshold)
-        threshold.set(400)
+                             from_=0, to=1023,
+                             orient=tk.HORIZONTAL,
+                             length=512,
+                             showvalue=tk.TRUE,
+                             command=self.set_threshold)
+        threshold.set(900)
         threshold.pack()
+
+        self.sensor_status = tk.Label(self.root, text="foobar")
+        self.sensor_status.pack()
+        self.update_job = self.root.after(50, self.update_sensors)
 
     def run(self):
         """
@@ -102,16 +124,26 @@ class RobotGui:
         """
         self.add_to_queue(f"THRESHOLD {int(threshold)}")
 
+    def update_sensors(self):
+        """
+        Update sensor data wigit
+        """
+        data = self.sensors.data
+        # A tuple of (-1, -1) for sensor data indicates program is shutting down
+        if data != (-1, -1):
+            self.sensor_status.configure(text=f"{data}")
+            self.update_job = self.root.after(50, self.update_sensors)
+
 
 def run_robot(arduino: serial.Serial,
               commands: queue.Queue,
-              finished: queue.Queue, ):
+              sensors: SensorData, ):
     """
     Process commands in queue and send to Arduino.
     """
     moving = False
     speed = 30
-    threshold = 400
+    threshold = 900
     while True:
         if not commands.empty():
             command = commands.get()
@@ -134,7 +166,8 @@ def run_robot(arduino: serial.Serial,
                     print(f"Setting Sensor Threshold to {val}")
                     threshold = int(val)
         if moving:
-            control_cycle(arduino, speed, threshold)
+            data = control_cycle(arduino, speed, threshold)
+            sensors.update(data)
         else:
             stop_robot(arduino)
 
@@ -155,12 +188,12 @@ def main():
 
     # Initialize variables
     commands = queue.Queue()
-    finished = queue.Queue()
-    gui = RobotGui(commands)
+    sensors = SensorData((0, 0))
+    gui = RobotGui(commands, sensors)
 
     # Start thread to process tasty data
     consumer = Thread(target=run_robot,
-                      args=[arduino, commands, finished],
+                      args=[arduino, commands, sensors],
                       daemon=True)
     consumer.start()
 
@@ -169,7 +202,7 @@ def main():
 
     # Wait for queue to finish. Add a DONE command.
     commands.put("DONE")
-    finished.join()
+    consumer.join()
 
     # Clean up
     print(f"Closing {port}")

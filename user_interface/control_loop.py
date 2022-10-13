@@ -16,9 +16,8 @@ def move_straight(arduino: serial.Serial, speed: int):
     """
     Move forward at a given speed.
     """
-    adjusted_speed = speed // 2
-    send_command(arduino, f"setWheelLeft {adjusted_speed}")
-    send_command(arduino, f"setWheelRight {adjusted_speed}")
+    send_command(arduino, f"setWheelLeft {speed}")
+    send_command(arduino, f"setWheelRight {speed}")
 
 
 def turn_left(arduino: serial.Serial, speed: int):
@@ -26,14 +25,14 @@ def turn_left(arduino: serial.Serial, speed: int):
     Turn left at given speed.
     """
     send_command(arduino, f"setWheelLeft {speed}")
-    send_command(arduino, "setWheelRight 0")
+    send_command(arduino, f"-setWheelRight {speed}")
 
 
 def turn_right(arduino: serial.Serial, speed: int):
     """
     Turn right at given speed.
     """
-    send_command(arduino, "setWheelLeft 0")
+    send_command(arduino, f"-setWheelLeft {speed}")
     send_command(arduino, f"setWheelRight {speed}")
 
 
@@ -51,20 +50,31 @@ def stop_robot(arduino: serial.Serial):
     send_command(arduino, "STOP")
 
 
-def control_cycle(arduino: serial.Serial, speed: int, threshold: int):
+def control_cycle(arduino: serial.Serial, speed: int, threshold: int) -> tuple:
     """
     One one cycle of the control loop.
+
+    Returns the sensor readings.
     """
     data = read_sensors(arduino)
 
-    if data[0] > threshold:
-        # If reading left, turn right
-        turn_right(arduino, speed)
-    if data[1] > threshold:
-        # If reading right, turn left
-        turn_left(arduino, speed)
-    else:
-        move_straight(arduino, speed)
+    left_over_tape = data[0] > threshold
+    right_over_tape = data[1] > threshold
+
+    match (left_over_tape, right_over_tape):
+        case (True, True):
+            # Both sensors are over tape, we are at start line
+            move_straight(arduino, speed)
+        case (False, False):
+            # Neither sensor is over tape
+            move_straight(arduino, speed)
+        case (True, False):
+            # Left sensor is over tape, turn right as sensor is in rear
+            turn_right(arduino, speed)
+        case (False, True):
+            # Right sensor is over tape, turn left as sensor is in rear
+            turn_left(arduino, speed)
+    return data
 
 
 def main():
