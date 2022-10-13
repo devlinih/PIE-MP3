@@ -20,17 +20,17 @@ def move_straight(arduino: serial.Serial, speed: int):
     send_command(arduino, f"setWheelRight {speed}")
 
 
-def turn_left(arduino: serial.Serial, speed: int):
+def turn_right(arduino: serial.Serial, speed: int):
     """
-    Turn left at given speed.
+    Turn right at given speed.
     """
     send_command(arduino, f"setWheelLeft {speed}")
     send_command(arduino, f"-setWheelRight {speed}")
 
 
-def turn_right(arduino: serial.Serial, speed: int):
+def turn_left(arduino: serial.Serial, speed: int):
     """
-    Turn right at given speed.
+    Turn left at given speed.
     """
     send_command(arduino, f"-setWheelLeft {speed}")
     send_command(arduino, f"setWheelRight {speed}")
@@ -69,11 +69,11 @@ def control_cycle(arduino: serial.Serial, speed: int, threshold: int) -> tuple:
             # Neither sensor is over tape
             move_straight(arduino, speed)
         case (True, False):
-            # Left sensor is over tape, turn right as sensor is in rear
-            turn_right(arduino, speed)
-        case (False, True):
-            # Right sensor is over tape, turn left as sensor is in rear
+            # Left sensor is over tape, turn left as sensor is in front
             turn_left(arduino, speed)
+        case (False, True):
+            # Right sensor is over tape, turn right as sensor is in front
+            turn_right(arduino, speed)
     return data
 
 
