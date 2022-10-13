@@ -34,9 +34,11 @@ class SensorData:
 
     def __init__(self, data: tuple[int, int]):
         self.data = data
+        self.history = []
 
     def update(self, data):
         self.data = data
+        self.history.append(data)
 
 
 class RobotGui:
