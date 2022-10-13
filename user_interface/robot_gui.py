@@ -37,8 +37,8 @@ class SensorData:
         self.history = []
 
     def update(self, data):
-        self.data = data
         self.history.append(data)
+        self.data = data
 
 
 class RobotGui:
