@@ -69,8 +69,8 @@ def control_cycle(arduino: serial.Serial, speed: int, threshold: int) -> tuple:
 
     match (left_over_tape, right_over_tape):
         case (True, True):
-            # Both sensors are over tape, we are at start line
-            speeds = move_straight(arduino, speed)
+            # Both sensors are over tape, we are at start line. Stop!
+            speeds = move_straight(arduino, 0)
         case (False, False):
             # Neither sensor is over tape
             speeds = move_straight(arduino, speed)
