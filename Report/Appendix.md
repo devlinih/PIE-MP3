@@ -9,12 +9,13 @@ figPrefix:
 lstPrefix:
     - "Listing"
     - "Listings"
-codeBlockCaptions: true
 ---
 
 # Appendix
 
 Source code can also be found in the project's [Github Repository](https://github.com/devlinih/PIE-MP3).
+
+# `LineRobotFirmware.ino`
 
 ```cpp
 // Firmware for a line following robot
@@ -108,7 +109,8 @@ void readSensors() {
   Serial.println(buffer);
 }
 ```
-: Complete Firmware Source for `LineRobotFirmware.ino` {#lst:Firmware}
+
+# `arduino.py`
 
 ```python
 """
@@ -177,7 +179,8 @@ def parse_tuple(message: str) -> tuple[int, int]:
     except:
         return (0, 0)
 ```
-: Complete listing for `arduino.py` {#lst:arduino.py}
+
+# `control_loop.py`
 
 ```python
 """
@@ -284,7 +287,8 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-: Complete source listing for `control_loop.py`. {#lst:Control.py}
+
+# robot_gui.py`
 
 ```python
 """
@@ -587,4 +591,3 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-: Complete source listing for `robot_gui.py`. {#lst:GUI.py}
