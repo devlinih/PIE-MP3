@@ -11,29 +11,35 @@ from arduino import (guess_port,
                      BAUDRATE,
                      ARDUINO_TIMEOUT,)
 
+DEFAULT_THRESHOLD = 780
+DEFAULT_SPEED = 35
 
-def move_straight(arduino: serial.Serial, speed: int):
+
+def move_straight(arduino: serial.Serial, speed: int) -> tuple[int, int]:
     """
     Move forward at a given speed.
     """
     send_command(arduino, f"setWheelLeft {speed}")
     send_command(arduino, f"setWheelRight {speed}")
+    return (speed, speed)
 
 
-def turn_right(arduino: serial.Serial, speed: int):
+def turn_right(arduino: serial.Serial, speed: int) -> tuple[int, int]:
     """
     Turn right at given speed.
     """
     send_command(arduino, f"setWheelLeft {speed}")
     send_command(arduino, f"-setWheelRight {speed}")
+    return (speed, -speed)
 
 
-def turn_left(arduino: serial.Serial, speed: int):
+def turn_left(arduino: serial.Serial, speed: int) -> tuple[int, int]:
     """
     Turn left at given speed.
     """
     send_command(arduino, f"-setWheelLeft {speed}")
     send_command(arduino, f"setWheelRight {speed}")
+    return (-speed, speed)
 
 
 def read_sensors(arduino: serial.Serial) -> tuple[int, int]:
@@ -64,25 +70,25 @@ def control_cycle(arduino: serial.Serial, speed: int, threshold: int) -> tuple:
     match (left_over_tape, right_over_tape):
         case (True, True):
             # Both sensors are over tape, we are at start line
-            move_straight(arduino, speed)
+            speeds = move_straight(arduino, speed)
         case (False, False):
             # Neither sensor is over tape
-            move_straight(arduino, speed)
+            speeds = move_straight(arduino, speed)
         case (True, False):
             # Left sensor is over tape, turn left as sensor is in front
-            turn_left(arduino, speed)
+            speeds = turn_left(arduino, speed)
         case (False, True):
             # Right sensor is over tape, turn right as sensor is in front
-            turn_right(arduino, speed)
-    return data
+            speeds = turn_right(arduino, speed)
+    return (data, speeds)
 
 
 def main():
     """
     Main loop, no interaction
     """
-    speed = 50
-    threshold = 400
+    speed = DEFAULT_SPEED
+    threshold = DEFAULT_THRESHOLD
 
     port = guess_port()
     arduino = serial.Serial(port, BAUDRATE,
